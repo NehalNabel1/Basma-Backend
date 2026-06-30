@@ -24,6 +24,7 @@ const router = express.Router();
 
 router.post(
   "/manager/signup",
+  uploadLogo,
   managerSignupValidator,
   validate,
   ctrl.managerSignup,
