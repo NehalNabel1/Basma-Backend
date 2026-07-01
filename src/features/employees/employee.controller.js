@@ -4,6 +4,7 @@ import { success, created } from "../../utils/response.js";
 import { saveDocument, processProfileImage } from "../../utils/upload.js";
 
 export const addEmployee = async (req, res) => {
+  
   const {
     name,
     email,
@@ -85,14 +86,16 @@ export const updateEmployee = async (req, res) => {
   const updates = { ...req.body };
 
   // Handle profile image upload
-  if (req.file) {
-    updates.profile_image_url = await processProfileImage(req.file.buffer);
+  if (req.files?.profile_image?.[0]) {
+    updates.profile_image_url = await processProfileImage(
+      req.files.profile_image[0].buffer,
+    );
   }
 
   // Handle new documents
   const documents = [];
-  if (req.files && Array.isArray(req.files)) {
-    for (const file of req.files) {
+  if (req.files?.documents) {
+    for (const file of req.files.documents) {
       const saved = await saveDocument(
         file.buffer,
         file.originalname,
@@ -139,4 +142,22 @@ export const resendInvite = async (req, res) => {
     companyName,
   });
   return success(res, {}, "Invite resent");
+};
+
+//  getEmployeesByDepartment
+export const getEmployeesByDepartment = async (req, res) => {
+  const { page, limit, search, branch } = req.query;
+  const result = await employeeService.getEmployees(req.user.company_id, {
+    page,
+    limit,
+    search,
+    branch,
+    department: req.params.department,
+  });
+  return success(res, result);
+};
+
+export const deleteEmployee = async (req, res) => {
+  await employeeService.deleteEmployee(req.params.id, req.user.company_id);
+  return success(res, {}, "Employee deleted");
 };

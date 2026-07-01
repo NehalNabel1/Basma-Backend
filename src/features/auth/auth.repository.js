@@ -309,21 +309,19 @@ export const acceptUserInvite = async ({
   profileImageUrl,
 }) => {
   await pool.query(
-    `
-    UPDATE users
-    SET
-      name=$1,
-      phone=$2,
-      password_hash=$3,
-      profile_image_url=COALESCE($4, profile_image_url),
-      is_active=true,
-      is_verified=true,
-      invite_accepted_at=NOW(),
-      invite_token=uuid_generate_v4(),
-      updated_at=NOW()
-    WHERE id=$5
-    `,
-    [name, phone, passwordHash, profileImageUrl, userId],
+    `UPDATE users
+     SET
+       name = COALESCE($1, name),
+       phone = COALESCE($2, phone),
+       password_hash = $3,
+       profile_image_url = COALESCE($4, profile_image_url),
+       is_active = true,
+       is_verified = true,
+       invite_accepted_at = NOW(),
+       invite_token = uuid_generate_v4(),
+       updated_at = NOW()
+     WHERE id = $5`,
+    [name, phone, passwordHash, profileImageUrl, userId]
   );
 };
 // ─── Company Queries ─────────────────────────────────────────────────────────
@@ -492,7 +490,7 @@ export const findInviteByEmail = async (email) => {
     .trim()
     .toLowerCase();
   const { rows } = await pool.query(
-    `SELECT u.id, u.name, u.email, u.role, u.invite_token, u.is_verified,
+    `SELECT u.id, u.name, u.email, u.role, u.invite_token, u.is_verified, u.phone,
             c.name as company_name
      FROM users u
      LEFT JOIN companies c ON c.id = u.company_id

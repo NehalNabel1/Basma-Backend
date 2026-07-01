@@ -25,6 +25,7 @@ export const addEmployee = async ({
   companyName,
   adderName,
 }) => {
+  
   const existing = await employeeRepo.findUserByEmail(email);
   if (existing) {
     throw Object.assign(new Error("Email already registered"), {
@@ -218,4 +219,15 @@ export const resendEmployeeInvite = async ({
 
   await employeeRepo.updateInviteSentAt(employeeId);
   return { email: updatedEmployee.email };
+};
+
+
+export const deleteEmployee = async (employeeId, companyId) => {
+  const employee = await employeeRepo.checkEmployeeExists(employeeId);
+  if (!employee)
+    throw Object.assign(new Error("Employee not found"), { statusCode: 404 });
+  if (employee.company_id !== companyId)
+    throw Object.assign(new Error("Access denied"), { statusCode: 403 });
+
+  await employeeRepo.deleteEmployeeById(employeeId);
 };

@@ -31,3 +31,14 @@ export const updateCompany = async (req, res) => {
   await profileService.updateCompany(req.user.company_id, req.body);
   return success(res, {}, 'Company updated successfully');
 };
+
+//for employee
+export const updateMyProfileImage = async (req, res) => {
+  if (!req.file) {
+    throw Object.assign(new Error("Profile image file is required"), { statusCode: 400 });
+  }
+  const url = await processProfileImage(req.file.buffer);
+  
+  await profileService.updateProfileImage(req.user.id, url);
+  return success(res, { profile_image_url: url }, "Profile image updated");
+};

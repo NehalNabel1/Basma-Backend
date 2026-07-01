@@ -2,7 +2,7 @@ import express from "express";
 import * as ctrl from "./employee.controller.js";
 import { protect, authorize } from "../../middleware/auth.middleware.js";
 import { validate } from "../../middleware/validate.middleware.js";
-import { uploadDocuments, uploadProfileImage } from "../../utils/upload.js";
+import { uploadDocuments, uploadEmployeeFiles } from "../../utils/upload.js";
 import {
   addEmployeeValidator,
   updateEmployeeValidator,
@@ -21,26 +21,19 @@ router.post(
   ctrl.addEmployee,
 );
 router.get("/", ctrl.getEmployees);
+router.get("/department/:department", ctrl.getEmployeesByDepartment); // moved here
 router.get("/:id", ctrl.getEmployee);
-
-// Handle updates (both multipart for profile images/new documents and JSON)
-// Combining multer middlewares as employees can update profile_image and documents
-const uploadMix = (req, res, next) => {
-  uploadDocuments(req, res, (err) => {
-    if (err) return next(err);
-    uploadProfileImage(req, res, next);
-  });
-};
 
 router.put(
   "/:id",
-  uploadMix,
+  uploadEmployeeFiles,
   updateEmployeeValidator,
   validate,
+  authorize("manager", "hr"),
   ctrl.updateEmployee,
 );
 router.post("/:id/resend-invite", ctrl.resendInvite);
 router.delete("/:id/documents/:docId", ctrl.deleteDocument);
 router.patch("/:id/status", authorize("manager", "hr"), ctrl.toggleStatus);
-
+router.delete("/:id", authorize("manager", "hr"), ctrl.deleteEmployee);
 export default router;

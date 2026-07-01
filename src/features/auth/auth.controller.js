@@ -252,7 +252,7 @@ export const googleCallback = (req, res, next) => {
         JSON.stringify(result.profile),
       ).toString("base64");
       return res.redirect(
-        `${process.env.FRONTEND_URL}/auth/complete-registration?profile=${profileEncoded}`,
+        `${process.env.FRONTEND_URL}/auth/register?profile=${profileEncoded}`,
       );
     } catch (error) {
       logger.error("Google callback error:", error);

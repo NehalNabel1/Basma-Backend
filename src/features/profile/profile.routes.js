@@ -17,5 +17,6 @@ router.get('/', ctrl.getProfile);
 router.put('/', uploadProfileImage, updateProfileValidator, validate, ctrl.updateProfile);
 router.put('/change-password', changePasswordValidator, validate, ctrl.changePassword);
 router.put('/company', updateCompanyValidator, validate, ctrl.updateCompany);
-
+//for employee
+router.put("/me/profile-image", protect, uploadProfileImage, ctrl.updateMyProfileImage);
 export default router;

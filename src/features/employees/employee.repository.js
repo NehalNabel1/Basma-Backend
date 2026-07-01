@@ -15,6 +15,20 @@ export const getCompanyName = async (companyId) => {
   return rows[0]?.name || null;
 };
 
+const getUniqueEmployeeCode = async (client) => {
+  let code;
+  let exists = true;
+  while (exists) {
+    code = generateEmployeeCode();
+    const { rows } = await client.query(
+      "SELECT 1 FROM users WHERE employee_code = $1",
+      [code],
+    );
+    exists = rows.length > 0;
+  }
+  return code;
+};
+
 export const createEmployeeInTransaction = async ({
   companyId,
   name,
@@ -34,15 +48,16 @@ export const createEmployeeInTransaction = async ({
 }) => {
   const client = await pool.connect();
   try {
+   
     await client.query("BEGIN");
-
+    const employeeCode = await getUniqueEmployeeCode(client);
     const { rows } = await client.query(
       `INSERT INTO users (
-        company_id, name, email, role, phone, address, national_id, birth_date,
-        job_title, department, branch, direct_manager, employment_type,
-        hire_date, is_active, is_verified, invite_sent_at
-      ) VALUES ($1,$2,$3,'employee',$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,false,false,NOW())
-      RETURNING id, name, email, invite_token`,
+    company_id, name, email, role, phone, address, national_id, birth_date,
+    job_title, department, branch, direct_manager, employment_type,
+    hire_date, employee_code, is_active, is_verified, invite_sent_at
+  ) VALUES ($1,$2,$3,'employee',$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,false,false,NOW())
+  RETURNING id, name, email, invite_token, employee_code`,
       [
         companyId,
         name,
@@ -57,6 +72,7 @@ export const createEmployeeInTransaction = async ({
         direct_manager || null,
         employment_type,
         hire_date,
+        employeeCode,
       ],
     );
     const employee = rows[0];
@@ -214,4 +230,11 @@ export const updateInviteSentAt = async (employeeId) => {
   await pool.query("UPDATE users SET invite_sent_at = NOW() WHERE id = $1", [
     employeeId,
   ]);
+};
+export const deleteEmployeeById = async (employeeId) => {
+  await pool.query("DELETE FROM users WHERE id = $1", [employeeId]);
+};
+const generateEmployeeCode = () => {
+  const digits = Math.floor(1000000 + Math.random() * 9000000); // 7 digits
+  return `SW${digits}`;
 };

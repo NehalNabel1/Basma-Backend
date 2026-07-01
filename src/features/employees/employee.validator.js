@@ -3,7 +3,7 @@ import { body } from 'express-validator';
 export const addEmployeeValidator = [
   // Required fields
   body('name').trim().notEmpty().withMessage('Employee name is required'),
-  body('phone').trim().notEmpty().withMessage('Phone number is required').isMobilePhone(),
+  body('phone').trim().notEmpty().withMessage('Phone number is required').isMobilePhone().withMessage('Phone number is not valid'),
   body('address').trim().notEmpty().withMessage('Address is required'),
 
   // Optional personal
@@ -16,9 +16,9 @@ export const addEmployeeValidator = [
   body('branch').trim().notEmpty().withMessage('Branch is required'),
   body('hire_date').notEmpty().withMessage('Hire date is required').isISO8601(),
   body('employment_type').trim().notEmpty().withMessage('Employment type is required'),
+  body('department').trim().notEmpty().withMessage('Department is required'),
 
   // Optional work
-  body('department').optional().trim(),
   body('direct_manager').optional().trim(),
 ];
 

@@ -47,3 +47,10 @@ export const updateCompanyFields = async (companyId, setClauses, params) => {
     [...params, companyId]
   );
 };
+//for employee
+export const updateProfileImageUrl = async (userId, url) => {
+  await pool.query(
+    "UPDATE users SET profile_image_url = $1, updated_at = NOW() WHERE id = $2",
+    [url, userId],
+  );
+};

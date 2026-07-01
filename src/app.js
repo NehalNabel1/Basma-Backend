@@ -25,6 +25,8 @@ import authRoutes from "./features/auth/auth.routes.js";
 import hrRoutes from "./features/hr/hr.routes.js";
 import employeeRoutes from "./features/employees/employee.routes.js";
 import profileRoutes from "./features/profile/profile.routes.js";
+import departmentRoutes from "./features/departments/departments.routes.js";
+import brancheRoutes from "./features/branches/branches.routes.js";
 
 // __dirname replacement for ES Modules
 const __filename = fileURLToPath(import.meta.url);
@@ -98,6 +100,9 @@ app.use("/api/auth", authRoutes);
 app.use("/api/hr", hrRoutes);
 app.use("/api/employees", employeeRoutes);
 app.use("/api/profile", profileRoutes);
+app.use("/api/departments", departmentRoutes);
+app.use("/api/branches", brancheRoutes);
+
 
 // ─── Error Handling ──────────────────────────────────────────────────────────
 app.use(notFoundHandler);
